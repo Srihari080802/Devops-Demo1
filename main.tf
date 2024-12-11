@@ -202,6 +202,13 @@ resource "aws_s3_bucket_versioning" "srihari_private_bucket_versioning" {
   }
 }
 
+# S3 Bucket ACL
+resource "aws_s3_bucket_acl" "srihari_private_bucket_acl" {
+  bucket = aws_s3_bucket.srihari_private_bucket.id
+  acl    = "private"
+}
+
+
 # IAM Role
 resource "aws_iam_role" "srihari_public_role" {
   name               = "srihari-public-role"
