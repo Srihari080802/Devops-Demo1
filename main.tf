@@ -1,4 +1,3 @@
-# Provider Configuration
 provider "aws" {
   region = "us-west-2"
 }
@@ -193,21 +192,27 @@ resource "aws_s3_bucket" "srihari_private_bucket" {
   bucket = "srihari-private-bucket"
 }
 
-# S3 Bucket Versioning
-resource "aws_s3_bucket_versioning" "srihari_private_bucket_versioning" {
-  bucket = aws_s3_bucket.srihari_private_bucket.bucket
-
-  versioning_configuration {
-    status = "Enabled"
+resource "aws_s3_bucket_ownership_controls" "srihari_private_bucket_ownership_controls" {
+  bucket = aws_s3_bucket.srihari_private_bucket.id # Associates the ownership controls with the bucket
+  rule {
+    object_ownership = "BucketOwnerPreferred" # Sets the object ownership rule
   }
 }
 
 # S3 Bucket ACL
 resource "aws_s3_bucket_acl" "srihari_private_bucket_acl" {
-  bucket = aws_s3_bucket.srihari_private_bucket.id
-  acl    = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.srihari_private_bucket_ownership_controls] # Ensures ownership controls are created first
+  bucket = aws_s3_bucket.srihari_private_bucket.id # Associates the ACL with the bucket
+  acl = "private" # Applies private ACL
 }
 
+# S3 Bucket Versioning
+resource "aws_s3_bucket_versioning" "srihari_s3_versioning" {
+  bucket = aws_s3_bucket.srihari_private_bucket.id # Associates versioning with the bucket
+  versioning_configuration {
+    status = "Enabled" # Enables versioning
+  }
+}
 
 # IAM Role
 resource "aws_iam_role" "srihari_public_role" {
